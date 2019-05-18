@@ -1,0 +1,8 @@
+-Primero #erase-startup config (#configure)para resetear la congiguración del switch.
+-Le ponemos las IP a los equipos(panel de control) y la IP al conmutador(#vlan 1 ip address 10.10.10.2/24).
+-Activar snmp (#snmp-server enable).
+-(#snmp-server host <IP> public all), donde <IP> representa la IP del PC que recibirá los traps.
+-FACTORY RESET AL AP UN VIAJE DE TIEMPO hasta que el power parpadee.
+-Meterse en 192.168.0.50(poner PC en subred para la configuración) y poner usuario admin y clave en blanco.
+- Meter la SSID proeyctogestion2 y clave abierta
+- Configuration > Save and activate para aplicar los cambios.

@@ -1,0 +1,54 @@
+COMO USAR LAS FUNCIONES DISEÑADAS PARA ENVIAR/RECIBIR DATOS SNMP:
+
+1) Incluir el archivo "snmp.h" que contiene las funciones diseñadas
+2) Crear una peticion SNMP de esta forma:
+	SNMP_Request *peticion = SNMP_CreateRequest(tipo, campos);
+		- tipo: puede ser SNMP_GETREQUEST, SNMP_GETNEXTREQUEST o SNMP_GETRESPONSE
+		- campos: Numero de campos que vamos a pedir en esta peticion
+
+3) Ahora tenemos que configurar cada campo que vamos a pedir/modificar:
+	SNMP_SetVarbind(peticion, indice, oid, tamaño_oid, tipo_de_dato, tamaño_datos, datos);
+		- peticion: el objeto SNMP_Request que hemos creado en el paso 2)
+		- indice: el campo que vamos a configurar (desde 0 a campos - 1)
+		- oid: OID del objeto de gestion que vamos a pedir/modificar,
+			es un array de tipo u16[] (enteros de 16 bits). Ejemplo:
+			u16 oid[] = {1, 3, 6, 1, 2, 1, 2, 2, 1, 1};  // Seria el OID 1.3.6.1.2.1.2.2.1.1
+		- tamaño_oid: Cuantos enteros tiene el OID. En el ejemplo anterior serian 10
+		- tipo_de_dato: uno de los siguientes
+			- SNMP_INTEGER (tipo INTEGER de ASN.1)
+			- SNMP_OCTET_STRING (un OCTET STRING)
+			- SNMP_NULL (un tipo NULL)
+			- SNMP_OID (un OBJECT-IDENTIFIER)
+			- SNMP_IPADDR (tipo IpAddress)
+			- SNMP_TIMETICKS (tipo TimeTicks)
+			- SNMP_COUNTER (tipo Counter)
+			- SNMP_GAUGE (tipo Gauge)
+			- SNMP_OPAQUE (tipo Opaque)
+			Estos son todos los tipos que soporta SNMPv1, si veis en las MIB alguno que no
+			es de estos mirad la definicion de ese tipo que seguro que es uno de estos
+		- tamaño_datos: tamaño en bytes de los datos (en caso de hacer un SET),
+				si hacemos un GET o un GETNEXT dejadlo a 0
+		- datos: datos a mandar (si hacemos un SET), si hacemos un GET o GETNEXT dejadlo a NULL
+			 importante que esos datos los creeis usando malloc() o calloc(), o se generara
+			 una excepcion al liberar la peticion
+
+4) Una vez configurada la peticion, la mandamos usando esta funcion:
+	SNMP_RequestData(peticion);
+	Esta funcion devuelve un int, que vale 0 si todo ha ido bien o -1 si ha habido algun error
+	En caso de haber algun error esta funcion lo muestra por pantalla
+
+5) Cuando hayamos hecho la peticion, podemos acceder a los campos que se han obtenido de esta forma (peticion es el objeto de tipo SNMP_Request que hemos estado usando).
+   Mucho ciudado con el indice_del_campo, no pasaros de los que habeis pedido o hareis un overflow:
+	peticion->field[indice_del_campo].oid		<-- Obtener el OID que se ha pedido (util en el GetNext)
+	peticion->field[indice_del_campo].oid_n		<-- Cuantos enteros tiene el OID que hemos pedido
+	peticion->field[indice_del_campo].data		<-- Datos recibidos de ese campo. Es un puntero void*, debeis castearlo segun el tipo de datos que hayais pedido
+							    Por ejemplo: si hemos pedido un OCTET STRING (o un IpAddress) para acceder a la cadena hemos de acceder asi:
+								char *cadena = (char*)peticion->field[indice_del_campo].data;
+							    Si hemos pedido un OBJECT-IDENTIFIER, accedemos como:
+								u16 *oid = (u16*)peticion->field[indice_del_campo].data;
+							    Si hemos pedido un INTEGER, TIMETICKS, GAUGE y el resto...
+								int entero = *(int*)peticion->field[indice_del_campo].data;
+	peticion->field[indice_del_campo].oid_n_data	<-- En el caso de que este campo que hayamos pedido sea un OBJECT-IDENTIFIER, podemos saber cuantos enteros tiene
+
+5) Una vez que hemos terminado con nuestra peticion, debemos liberar su memoria:
+	SNMP_FreeRequest(peticion);

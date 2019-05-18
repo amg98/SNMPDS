@@ -1,0 +1,24 @@
+- Pantalla principal: Toca para comenzar!
+- Búsqueda de AP
+- Introducir clave WEP / Conectando
+- Menu principal
+	- Informacion del switch -> MIB2 System
+		- Formulario para cambiar cosas
+	- Visualizacion
+		- Ver interfaces -> MIB2 Interfaces
+			- Navegar por la tabla de interfaces
+		- Ver traps
+			- Borrar
+			- Mandarlos por TFTP (con un audio)
+	- Programar alarma -> RMON Alarm + RMON Events
+	- Configuracion del gestor
+		- IP Gestor (solo lectura)
+		- MAC Gestor (solo lectura)
+		- Puerto SNMP
+		- Puerto TRAP
+		- IP Agente
+		- IP Servidor TFTP
+		- Nombre comunidad
+
+FUNCIONALIDADES EN SEGUNDO PLANO:
+- Ir recibiendo traps e ir guardandolos en un archivo de texto (FAT)

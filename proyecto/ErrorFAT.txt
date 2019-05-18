@@ -1,0 +1,4 @@
+Si al ejecutar el proyecto en la NDS te da el error: "Error: tu flashcard no soporta FAT",
+tienes que parchear el ejecutable segun tu flashcard, siguiendo este tutorial:
+
+https://www.chishm.com/DLDI/
